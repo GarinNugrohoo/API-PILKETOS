@@ -1,9 +1,9 @@
-# 🚀 Project Name: Awesome Backend Service
+# 🚀 API-PILKETOS: Awesome Backend Service
 
-![Node.js](https://shields.io)
-![Supabase](https://shields.io)
-![Sequelize](https://shields.io)
-![PostgreSQL](https://shields.io)
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
+![Sequelize](https://img.shields.io/badge/Sequelize-52B0E7?style=for-the-badge&logo=sequelize&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
 
 ## ✨ Fitur Utama
 
