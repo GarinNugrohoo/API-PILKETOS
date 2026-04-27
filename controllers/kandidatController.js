@@ -43,6 +43,7 @@ class KandidatController {
       });
 
       if (checkDb != null) {
+        if (req.file) fs.unlinkSync(req.file.path);
         return HttpCode.send(res, 400, {
           message: "Nama atau nomor urut sudah terdaftar",
         });
