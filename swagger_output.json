@@ -1,0 +1,401 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "API PILKETOS-WEB",
+    "description": "Dokumentasi Endpoint API PILKETOS-WEB",
+    "version": "1.0.0"
+  },
+  "host": "localhost:3000",
+  "basePath": "/",
+  "schemes": ["http"],
+  "securityDefinitions": {
+    "bearerAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "Format: Bearer <token>"
+    },
+    "apiKeyAuth": {
+      "type": "apiKey",
+      "name": "key",
+      "in": "header",
+      "description": "Masukkan API Key sistem kamu di sini"
+    }
+  },
+
+  "paths": {
+    "/api/peserta/generate": {
+      "post": {
+        "tags": ["Peserta"],
+        "summary": "Generate Kode Peserta (Bulk Create)",
+        "security": [{ "apiKeyAuth": [], "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "kelas": {
+                  "type": "string",
+                  "example": "X",
+                  "enum": ["X", "XI", "XII"]
+                },
+                "jumlah_siswa": { "type": "integer", "example": 100 }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Berhasil membuat kode peserta" },
+          "400": { "description": "Data tidak lengkap atau kelas tidak valid" },
+          "429": {
+            "description": "Terlalu banyak request (Max 2000 per create)"
+          },
+          "500": { "description": "Server Error" }
+        }
+      }
+    },
+    "/api/peserta/data": {
+      "get": {
+        "tags": ["Peserta"],
+        "summary": "Ambil Semua Data Peserta",
+        "security": [{ "apiKeyAuth": [], "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Berhasil mengambil data" },
+          "404": { "description": "Data tidak ditemukan" },
+          "401": { "description": "Unauthorized" },
+          "500": { "description": "Server Error" }
+        }
+      }
+    },
+    "/api/peserta/login": {
+      "post": {
+        "tags": ["Peserta"],
+        "summary": "Login Peserta menggunakan Kode",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "kode_peserta": { "type": "string", "example": "X671257318" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Login berhasil" },
+          "400": { "description": "Kode peserta salah / wajib diisi" },
+          "500": { "description": "Server Error" }
+        }
+      }
+    },
+    "/api/peserta/vote": {
+      "post": {
+        "tags": ["Peserta"],
+        "summary": "Proses Voting (Hanya untuk Peserta)",
+        "security": [{ "apiKeyAuth": [], "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "kode_peserta": { "type": "string", "example": "X671257318" },
+                "nomor_urut": { "type": "string", "example": "1" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Vote berhasil disimpan" },
+          "401": { "description": "Unauthorized" },
+          "500": { "description": "Server Error" }
+        }
+      }
+    },
+    "/api/peserta/generate/kartu": {
+      "post": {
+        "tags": ["Peserta"],
+        "summary": "Generate PDF Kartu Peserta",
+        "security": [{ "apiKeyAuth": [], "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "kelas": {
+                  "type": "string",
+                  "example": "ALL",
+                  "description": "X, XI, XII atau ALL"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": { "description": "File PDF berhasil dibuat di server" },
+          "404": { "description": "Data tidak ditemukan" },
+          "500": { "description": "Server Error" }
+        }
+      }
+    },
+    "/api/peserta/all": {
+      "delete": {
+        "tags": ["Peserta"],
+        "summary": "Hapus Seluruh Data Peserta",
+        "security": [{ "apiKeyAuth": [], "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Berhasil menghapus seluruh data" },
+          "500": { "description": "Server Error" }
+        }
+      }
+    },
+    "/api/kandidat/generate": {
+      "post": {
+        "tags": ["Kandidat"],
+        "summary": "Create Kandidat (Upload Image)",
+        "security": [{ "apiKeyAuth": [], "bearerAuth": [] }],
+        "consumes": ["multipart/form-data"],
+        "parameters": [
+          {
+            "name": "nomor_urut",
+            "in": "formData",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "nama_kandidat",
+            "in": "formData",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "password",
+            "in": "formData",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "visi",
+            "in": "formData",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "misi",
+            "in": "formData",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "image_kandidat",
+            "in": "formData",
+            "type": "file",
+            "required": true
+          }
+        ],
+        "responses": {
+          "201": { "description": "Berhasil membuat akun" },
+          "400": {
+            "description": "Data tidak lengkap / Nama atau nomor urut sudah terdaftar"
+          },
+          "500": { "description": "Server Error" }
+        }
+      }
+    },
+    "/api/kandidat/data": {
+      "get": {
+        "tags": ["Kandidat"],
+        "summary": "Get All Kandidat",
+        "responses": {
+          "200": { "description": "Data ditemukan" },
+          "404": { "description": "Data tidak ditemukan" },
+          "500": { "description": "Server Error" }
+        }
+      },
+      "patch": {
+        "tags": ["Kandidat"],
+        "summary": "Update Kandidat (Fleksibel)",
+        "description": "Gunakan format multipart/form-data jika ingin mengupdate foto.",
+        "security": [{ "apiKeyAuth": [], "bearerAuth": [] }],
+        "consumes": ["multipart/form-data"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "formData",
+            "description": "ID Kandidat yang akan diupdate",
+            "required": true,
+            "type": "integer",
+            "example": 1
+          },
+          {
+            "name": "nomor_urut",
+            "in": "formData",
+            "type": "integer",
+            "example": 1
+          },
+          {
+            "name": "nama_kandidat",
+            "in": "formData",
+            "type": "string",
+            "example": "Budi Santoso"
+          },
+          {
+            "name": "password_lama",
+            "in": "formData",
+            "description": "Wajib diisi jika ingin mengganti password baru",
+            "type": "string",
+            "example": "password123"
+          },
+          {
+            "name": "password_baru",
+            "in": "formData",
+            "type": "string",
+            "example": "passwordBaru456"
+          },
+          {
+            "name": "visi",
+            "in": "formData",
+            "type": "string",
+            "example": "Menjadikan organisasi lebih maju"
+          },
+          {
+            "name": "misi",
+            "in": "formData",
+            "type": "string",
+            "example": "Meningkatkan kualitas SDM"
+          },
+          {
+            "name": "image_kandidat",
+            "in": "formData",
+            "description": "File foto kandidat (jpg/png)",
+            "type": "file"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Berhasil memperbarui data kandidat" },
+          "400": {
+            "description": "Kesalahan input (ID kosong/Data tidak diisi/Karakter terlalu panjang)"
+          },
+          "401": { "description": "Password lama salah" },
+          "404": { "description": "Kandidat tidak ditemukan" },
+          "500": { "description": "Server Error" }
+        }
+      }
+    },
+    "/api/kandidat/login": {
+      "post": {
+        "tags": ["Kandidat"],
+        "summary": "Login Kandidat",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "nama_kandidat": { "example": "kandidat" },
+                "password": { "example": "kandidat" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Login berhasil" },
+          "400": { "description": "Nama atau Password salah" },
+          "500": { "description": "Server Error" }
+        }
+      }
+    },
+    "/api/kandidat/{id}": {
+      "delete": {
+        "tags": ["Kandidat"],
+        "summary": "Delete Kandidat by ID",
+        "security": [{ "apiKeyAuth": [], "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "ID harus berupa angka"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Berhasil menghapus data" },
+          "400": { "description": "Id tidak valid / tidak ditemukan" },
+          "500": { "description": "Server Error" }
+        }
+      }
+    },
+
+    "/api/panitia/generate": {
+      "post": {
+        "tags": ["Panitia"],
+        "summary": "Membuat Akun Panitia Baru",
+        "security": [{ "apiKeyAuth": [], "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "nama": { "example": "admin" },
+                "password": { "example": "admin" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Akun panitia berhasil dibuat" },
+          "400": {
+            "description": "Data panitia wajib diisi / akun sudah terdaftar"
+          },
+          "500": { "description": "Server Error" }
+        }
+      }
+    },
+    "/api/panitia/data": {
+      "get": {
+        "tags": ["Panitia"],
+        "summary": "Mengambil Semua Data Panitia",
+        "security": [{ "apiKeyAuth": [], "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Berhasil mengambil data" },
+          "500": { "description": "Server Error" }
+        }
+      }
+    },
+    "/api/panitia/login": {
+      "post": {
+        "tags": ["Panitia"],
+        "summary": "Login Panitia",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "nama": { "example": "admin" },
+                "password": { "example": "admin" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Login berhasil" },
+          "400": { "description": "Nama atau Password salah / wajib diisi" },
+          "500": { "description": "Server Error" }
+        }
+      }
+    }
+  }
+}
