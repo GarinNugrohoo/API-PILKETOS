@@ -54,6 +54,14 @@
    npm run dev
    ```
 
+## 📸 API Documentation Preview
+
+Berikut adalah tampilan dokumentasi API menggunakan Swagger UI:
+
+<p align="center">
+  <img src="https://ibb.co.com/fVvjbnxL" alt="Swagger Documentation" width="100%">
+</p>
+
 ## 📐 Database Schema
 
 Proyek ini menggunakan **Structural Design Pattern** dalam penyusunan model data untuk memastikan kode tetap _maintainable_ dan mudah dikembangkan.
