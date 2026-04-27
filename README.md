@@ -15,7 +15,7 @@
 - **Runtime**: Node.js
 - **ORM & Migrations**: Sequelize
 - **Database**: PostgreSQL
-- **Driver**: `pg` & `pg-hstore`
+- **Driver**: `pg`
 
 ## ⚙️ Cara Instalasi
 
