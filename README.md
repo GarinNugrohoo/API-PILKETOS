@@ -1,9 +1,10 @@
-# 🚀 Project Name: Awesome Backend Service
+# 🚀 API-PILKETOS: Awesome Backend Service
 
-![Node.js](https://shields.io)
-![Supabase](https://shields.io)
-![Sequelize](https://shields.io)
-![PostgreSQL](https://shields.io)
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![Express](https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white)
+![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)
+![Sequelize](https://img.shields.io/badge/Sequelize-52B0E7?style=for-the-badge&logo=sequelize&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
 
 ## ✨ Fitur Utama
 
@@ -13,9 +14,11 @@
 ## 🛠️ Tech Stack
 
 - **Runtime**: Node.js
+- **Framework**: Express.js
+- **Documentation**: Swagger UI
 - **ORM & Migrations**: Sequelize
 - **Database**: PostgreSQL
-- **Driver**: `pg` & `pg-hstore`
+- **Driver**: `pg`
 
 ## ⚙️ Cara Instalasi
 
