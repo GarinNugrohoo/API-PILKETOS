@@ -68,7 +68,7 @@ class KandidatController {
       if (req.file) {
         const filePath = path.join(
           __dirname,
-          "../assets/images/",
+          "../assets/images/kandidat/",
           req.file.filename,
         );
         fs.unlink(filePath, (err) => {
