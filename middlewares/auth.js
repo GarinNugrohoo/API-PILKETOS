@@ -18,6 +18,8 @@ class Auth {
             message: "Login tidak valid",
           });
 
+        req.dataUser = decoded;
+
         const index = rolePengguna.length;
 
         for (var i = 0; i < index; i++) {
@@ -31,8 +33,6 @@ class Auth {
             message: "Akses ditolak",
           });
         }
-
-        req.dataUser = decoded;
 
         next();
       });
