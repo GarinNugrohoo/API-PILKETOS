@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 
 class isMaintenance {
   constructor() {
-    this.maintenanceMode = true;
+    this.maintenanceMode = false;
     this.role = "panitia";
   }
 
