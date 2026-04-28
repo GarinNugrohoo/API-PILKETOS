@@ -6,7 +6,7 @@ const swaggerFile = require("./swagger_output.json");
 const path = require("path");
 const app = express();
 const port = process.env.PORT;
-const GIT_URL = "https://cdnjs.cloudflare.com";
+const GIT_URL = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/";
 
 app.use(express.json());
 
