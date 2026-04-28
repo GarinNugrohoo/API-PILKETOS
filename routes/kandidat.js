@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const kandidatController = require("../controllers/kandidatController");
+const voteController = require("../controllers/voteController");
 const upload = require("../middlewares/upload");
 const Auth = require("../middlewares/auth");
 const ApiKey = require("../middlewares/apiKey");
@@ -23,6 +24,12 @@ router.post(
   isMaintenance.activeMaintenance,
   upload.single("image_kandidat"),
   kandidatController.createKandidat,
+);
+router.post(
+  "/laporan/berita",
+  Auth.roleAccess("panitia"),
+  isMaintenance.activeMaintenance,
+  voteController.createPemenang,
 );
 router.post("/login", kandidatController.loginKandidat);
 

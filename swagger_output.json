@@ -316,6 +316,26 @@
         }
       }
     },
+
+    "/api/kandidat/laporan/berita": {
+      "post": {
+        "tags": ["Kandidat"],
+        "summary": "Generate PDF Laporan Berita Acara (SK Hasil)",
+        "security": [{ "apiKeyAuth": [], "bearerAuth": [] }],
+        "responses": {
+          "201": {
+            "description": "File PDF laporan berhasil dibuat di server"
+          },
+          "404": {
+            "description": "Data kandidat tidak ditemukan"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+
     "/api/kandidat/{id}": {
       "delete": {
         "tags": ["Kandidat"],
