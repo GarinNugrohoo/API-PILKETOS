@@ -15,6 +15,11 @@ app.use("/uploads", express.static(path.join(__dirname, "assets/pdf")));
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
-app.listen(port, () => {
-  console.log(`App listening on port ${port}`);
-});
+module.exports = app;
+
+if (process.env.NODE_ENV !== "production") {
+  const port = process.env.PORT || 3000;
+  app.listen(port, () => {
+    console.log(`App listening on port ${port}`);
+  });
+}
