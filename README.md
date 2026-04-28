@@ -59,7 +59,7 @@
 Berikut adalah tampilan dokumentasi API menggunakan Swagger UI:
 
 <p align="center">
-  <img src="https://ibb.co.com/fVvjbnxL" alt="Swagger Documentation" width="100%">
+  <img src="assets/images/preview.png" alt="Swagger Documentation" width="100%">
 </p>
 
 ## 📐 Database Schema
