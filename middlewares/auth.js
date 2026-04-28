@@ -32,6 +32,8 @@ class Auth {
           });
         }
 
+        req.dataUser = decoded;
+
         next();
       });
     };

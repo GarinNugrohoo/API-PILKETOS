@@ -3,6 +3,7 @@ const kandidatController = require("../controllers/kandidatController");
 const upload = require("../middlewares/upload");
 const Auth = require("../middlewares/auth");
 const ApiKey = require("../middlewares/apiKey");
+const isMaintenance = require("../middlewares/isMaintenance");
 
 // APIKEY
 router.use(ApiKey.keyAccess);
@@ -11,6 +12,7 @@ router.use(ApiKey.keyAccess);
 router.get(
   "/data",
   Auth.roleAccess(["peserta", "panitia", "kandidat"]),
+  isMaintenance.activeMaintenance,
   kandidatController.getAllKandidat,
 );
 
@@ -18,6 +20,7 @@ router.get(
 router.post(
   "/generate",
   Auth.roleAccess("panitia"),
+  isMaintenance.activeMaintenance,
   upload.single("image_kandidat"),
   kandidatController.createKandidat,
 );
@@ -27,6 +30,7 @@ router.post("/login", kandidatController.loginKandidat);
 router.patch(
   "/data",
   Auth.roleAccess(["panitia", "kandidat"]),
+  isMaintenance.activeMaintenance,
   kandidatController.updateKandidat,
 );
 
@@ -34,6 +38,7 @@ router.patch(
 router.delete(
   "/:id",
   Auth.roleAccess("panitia"),
+  isMaintenance.activeMaintenance,
   kandidatController.deleteKandidatById,
 );
 

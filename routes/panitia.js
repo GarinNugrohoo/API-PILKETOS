@@ -2,6 +2,7 @@ const router = require("express").Router();
 const panitiaController = require("../controllers/panitiaController");
 const Auth = require("../middlewares/auth");
 const ApiKey = require("../middlewares/apiKey");
+const isMaintenance = require("../middlewares/isMaintenance");
 
 // APIKEY
 router.use(ApiKey.keyAccess);

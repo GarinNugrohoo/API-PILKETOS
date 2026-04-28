@@ -17,7 +17,7 @@
     },
     "apiKeyAuth": {
       "type": "apiKey",
-      "name": "key",
+      "name": "x-api-key",
       "in": "header",
       "description": "Masukkan API Key sistem kamu di sini"
     }
@@ -73,6 +73,7 @@
       "post": {
         "tags": ["Peserta"],
         "summary": "Login Peserta menggunakan Kode",
+        "security": [{ "apiKeyAuth": [] }],
         "parameters": [
           {
             "name": "body",
@@ -213,6 +214,7 @@
       "get": {
         "tags": ["Kandidat"],
         "summary": "Get All Kandidat",
+        "security": [{ "apiKeyAuth": [], "bearerAuth": [] }],
         "responses": {
           "200": { "description": "Data ditemukan" },
           "404": { "description": "Data tidak ditemukan" },
@@ -293,6 +295,7 @@
       "post": {
         "tags": ["Kandidat"],
         "summary": "Login Kandidat",
+        "security": [{ "apiKeyAuth": [] }],
         "parameters": [
           {
             "name": "body",
@@ -377,6 +380,7 @@
       "post": {
         "tags": ["Panitia"],
         "summary": "Login Panitia",
+        "security": [{ "apiKeyAuth": [] }],
         "parameters": [
           {
             "name": "body",

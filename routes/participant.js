@@ -3,6 +3,7 @@ const participantController = require("../controllers/participantController");
 const voteController = require("../controllers/voteController");
 const Auth = require("../middlewares/auth");
 const ApiKey = require("../middlewares/apiKey");
+const isMaintenance = require("../middlewares/isMaintenance");
 
 // APIKEY
 router.use(ApiKey.keyAccess);
@@ -11,6 +12,7 @@ router.use(ApiKey.keyAccess);
 router.get(
   "/data",
   Auth.roleAccess("panitia"),
+  isMaintenance.activeMaintenance,
   participantController.getAllPeserta,
 );
 
@@ -18,20 +20,28 @@ router.get(
 router.post(
   "/generate",
   Auth.roleAccess("panitia"),
+  isMaintenance.activeMaintenance,
   participantController.createPeserta,
 );
 router.post(
   "/generate/kartu",
   Auth.roleAccess("panitia"),
+  isMaintenance.activeMaintenance,
   participantController.createKartuPeserta,
 );
 router.post("/login", participantController.loginPeserta);
-router.post("/vote", Auth.roleAccess("peserta"), voteController.voting);
+router.post(
+  "/vote",
+  Auth.roleAccess("peserta"),
+  isMaintenance.activeMaintenance,
+  voteController.voting,
+);
 
 // DELETE
 router.delete(
   "/all",
   Auth.roleAccess("panitia"),
+  isMaintenance.activeMaintenance,
   participantController.deleteAllPeserta,
 );
 
