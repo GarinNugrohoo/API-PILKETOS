@@ -7,6 +7,7 @@ module.exports = {
   development: {
     use_env_variable: "DATABASE_URL",
     dialect: "postgres",
+    dialectModule: require("pg"),
     dialectOptions: isSupabase
       ? {
           ssl: {
@@ -20,6 +21,7 @@ module.exports = {
   production: {
     use_env_variable: "DATABASE_URL",
     dialect: "postgres",
+    dialectModule: require("pg"),
     dialectOptions: {
       ssl: {
         require: true,
