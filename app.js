@@ -13,7 +13,7 @@ app.use(router);
 app.use("/uploads", express.static(path.join(__dirname, "assets/images")));
 app.use("/uploads", express.static(path.join(__dirname, "assets/pdf")));
 
-app.use("/", swaggerUi.serve, swaggerUi.setup(swaggerFile));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 app.listen(port, () => {
   console.log(`App listening on port ${port}`);
