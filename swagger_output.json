@@ -420,6 +420,27 @@
           "500": { "description": "Server Error" }
         }
       }
+    },
+    "/api/panitia/{id}": {
+      "delete": {
+        "tags": ["Panitia"],
+        "summary": "Delete Panitia by ID",
+        "security": [{ "apiKeyAuth": [], "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "ID harus berupa angka"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Berhasil menghapus data" },
+          "400": { "description": "Id tidak valid / tidak ditemukan" },
+          "500": { "description": "Server Error" }
+        }
+      }
     }
   }
 }

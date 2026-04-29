@@ -25,4 +25,11 @@ router.patch(
   panitiaController.updatePanitia,
 );
 
+// DELETE
+router.delete(
+  "/:id",
+  Auth.roleAccess("panitia"),
+  panitiaController.deletePanitia,
+);
+
 module.exports = router;

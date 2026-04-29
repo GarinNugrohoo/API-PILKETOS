@@ -174,6 +174,27 @@ class PanitiaController {
       });
     }
   }
+
+  async deletePanitia(req, res) {
+    const { id } = req.params;
+
+    try {
+      if (!id) {
+        return HttpCode.send(res, 400, { message: "Invalid id" });
+      }
+      const data = await Panitia.findOne({ where: { id: id } });
+
+      if (data === null) {
+        return HttpCode.send(res, 400, { message: "Invalid id" });
+      } else if (data !== null) {
+        const deleteData = await Panitia.destroy({ where: { id: id } });
+
+        return HttpCode.send(res, 200, { message: "Data berhasil dihapus" });
+      }
+    } catch (err) {
+      HttpCode.send(res, 500, { message: `${err}` });
+    }
+  }
 }
 
 module.exports = new PanitiaController();
