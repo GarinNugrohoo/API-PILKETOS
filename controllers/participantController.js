@@ -5,6 +5,7 @@ const HttpCode = require("./http-code/httpCode");
 const jwt = require("jsonwebtoken");
 const { Participant } = require("../models");
 const { Sequelize } = require("sequelize");
+const kandidatController = require("./kandidatController");
 
 class ParticipantController {
   async createPeserta(req, res) {
@@ -131,6 +132,46 @@ class ParticipantController {
       return HttpCode.send(res, 500, {
         message: `${err}`,
       });
+    }
+  }
+
+  async resetPesertaStatus(req, res) {
+    const { status, kode_peserta, kode_reset } = req.body;
+
+    try {
+      if (!status || !kode_peserta || !kode_reset) {
+        return HttpCode.send(res, 400, {
+          message: "Status, kode reset, atau kode peserta tidak valid",
+        });
+      }
+
+      if (kode_reset !== process.env.KODE_RESET) {
+        return HttpCode.send(res, 400, {
+          message: "Status, kode reset, atau kode peserta tidak valid",
+        });
+      }
+
+      if (status === false) {
+        return HttpCode.send(res, 400, { message: "Invalid status" });
+      }
+
+      const data = await Participant.findOne({
+        where: { kode_peserta: kode_peserta },
+      });
+
+      if (data === null) {
+        return HttpCode.send(res, 404, { message: "Data tidak ditemukan" });
+      } else if (data.memilih === false) {
+        return HttpCode.send(res, 400, { message: "Invalid status" });
+      } else if (data.memilih === true) {
+        const updateData = await Participant.update(
+          { memilih: false },
+          { where: { kode_peserta: kode_peserta } },
+        );
+        return HttpCode.send(res, 200, { message: "Data berhasil di reset" });
+      }
+    } catch (err) {
+      return HttpCode.send(res, 500, { message: `${err}` });
     }
   }
 

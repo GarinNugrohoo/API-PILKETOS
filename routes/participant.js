@@ -37,6 +37,14 @@ router.post(
   voteController.voting,
 );
 
+// PATCH
+router.patch(
+  "/reset/status",
+  Auth.roleAccess("panitia"),
+  isMaintenance.activeMaintenance,
+  participantController.resetPesertaStatus,
+);
+
 // DELETE
 router.delete(
   "/all",

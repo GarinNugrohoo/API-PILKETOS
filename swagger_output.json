@@ -56,19 +56,7 @@
         }
       }
     },
-    "/api/peserta/data": {
-      "get": {
-        "tags": ["Peserta"],
-        "summary": "Ambil Semua Data Peserta",
-        "security": [{ "apiKeyAuth": [], "bearerAuth": [] }],
-        "responses": {
-          "200": { "description": "Berhasil mengambil data" },
-          "404": { "description": "Data tidak ditemukan" },
-          "401": { "description": "Unauthorized" },
-          "500": { "description": "Server Error" }
-        }
-      }
-    },
+
     "/api/peserta/login": {
       "post": {
         "tags": ["Peserta"],
@@ -93,6 +81,7 @@
         }
       }
     },
+
     "/api/peserta/vote": {
       "post": {
         "tags": ["Peserta"],
@@ -118,6 +107,7 @@
         }
       }
     },
+
     "/api/peserta/generate/kartu": {
       "post": {
         "tags": ["Peserta"],
@@ -146,6 +136,63 @@
         }
       }
     },
+
+    "/api/peserta/data": {
+      "get": {
+        "tags": ["Peserta"],
+        "summary": "Ambil Semua Data Peserta",
+        "security": [{ "apiKeyAuth": [], "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Berhasil mengambil data" },
+          "404": { "description": "Data tidak ditemukan" },
+          "401": { "description": "Unauthorized" },
+          "500": { "description": "Server Error" }
+        }
+      }
+    },
+
+    "/api/peserta/reset/status": {
+      "patch": {
+        "tags": ["Peserta"],
+        "summary": "Reset status peserta",
+        "security": [{ "apiKeyAuth": [], "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "kode_peserta": {
+                  "type": "string",
+                  "example": "X426149699",
+                  "description": "X426149699"
+                },
+                "kode_reset": {
+                  "type": "string",
+                  "example": "PILKETOS",
+                  "description": "Kode reset"
+                },
+                "status": {
+                  "type": "string",
+                  "example": "true",
+                  "description": "Status awal"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Berhasil reset status peserta" },
+          "400": {
+            "description": "Status, kode reset, atau kode peserta tidak valid"
+          },
+          "404": { "description": "Data tidak ditemukan" },
+          "500": { "description": "Server Error" }
+        }
+      }
+    },
+
     "/api/peserta/all": {
       "delete": {
         "tags": ["Peserta"],
@@ -157,6 +204,7 @@
         }
       }
     },
+
     "/api/kandidat/generate": {
       "post": {
         "tags": ["Kandidat"],
@@ -210,6 +258,52 @@
         }
       }
     },
+
+    "/api/kandidat/login": {
+      "post": {
+        "tags": ["Kandidat"],
+        "summary": "Login Kandidat",
+        "security": [{ "apiKeyAuth": [] }],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "nama_kandidat": { "example": "kandidat" },
+                "password": { "example": "kandidat" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Login berhasil" },
+          "400": { "description": "Nama atau Password salah" },
+          "500": { "description": "Server Error" }
+        }
+      }
+    },
+
+    "/api/kandidat/laporan/berita": {
+      "post": {
+        "tags": ["Kandidat"],
+        "summary": "Generate PDF Laporan Berita Acara (SK Hasil)",
+        "security": [{ "apiKeyAuth": [], "bearerAuth": [] }],
+        "responses": {
+          "201": {
+            "description": "File PDF laporan berhasil dibuat di server"
+          },
+          "404": {
+            "description": "Data kandidat tidak ditemukan"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+
     "/api/kandidat/data": {
       "get": {
         "tags": ["Kandidat"],
@@ -291,50 +385,6 @@
         }
       }
     },
-    "/api/kandidat/login": {
-      "post": {
-        "tags": ["Kandidat"],
-        "summary": "Login Kandidat",
-        "security": [{ "apiKeyAuth": [] }],
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "nama_kandidat": { "example": "kandidat" },
-                "password": { "example": "kandidat" }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": { "description": "Login berhasil" },
-          "400": { "description": "Nama atau Password salah" },
-          "500": { "description": "Server Error" }
-        }
-      }
-    },
-
-    "/api/kandidat/laporan/berita": {
-      "post": {
-        "tags": ["Kandidat"],
-        "summary": "Generate PDF Laporan Berita Acara (SK Hasil)",
-        "security": [{ "apiKeyAuth": [], "bearerAuth": [] }],
-        "responses": {
-          "201": {
-            "description": "File PDF laporan berhasil dibuat di server"
-          },
-          "404": {
-            "description": "Data kandidat tidak ditemukan"
-          },
-          "500": {
-            "description": "Server Error"
-          }
-        }
-      }
-    },
 
     "/api/kandidat/{id}": {
       "delete": {
@@ -385,17 +435,7 @@
         }
       }
     },
-    "/api/panitia/data": {
-      "get": {
-        "tags": ["Panitia"],
-        "summary": "Mengambil Semua Data Panitia",
-        "security": [{ "apiKeyAuth": [], "bearerAuth": [] }],
-        "responses": {
-          "200": { "description": "Berhasil mengambil data" },
-          "500": { "description": "Server Error" }
-        }
-      }
-    },
+
     "/api/panitia/login": {
       "post": {
         "tags": ["Panitia"],
@@ -421,6 +461,19 @@
         }
       }
     },
+
+    "/api/panitia/data": {
+      "get": {
+        "tags": ["Panitia"],
+        "summary": "Mengambil Semua Data Panitia",
+        "security": [{ "apiKeyAuth": [], "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Berhasil mengambil data" },
+          "500": { "description": "Server Error" }
+        }
+      }
+    },
+
     "/api/panitia/{id}": {
       "delete": {
         "tags": ["Panitia"],
