@@ -7,7 +7,9 @@ const path = require("path");
 const app = express();
 const port = process.env.PORT;
 const GIT_URL = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/";
+const cors = require("cors");
 
+app.use(cors());
 app.use(express.json());
 
 app.use(router);
