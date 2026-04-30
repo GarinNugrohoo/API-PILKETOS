@@ -6,7 +6,8 @@ const { Kandidat, Participant } = require("../models");
 
 class VoteController {
   async voting(req, res) {
-    const { kode_peserta, nomor_urut } = req.body;
+    const { nomor_urut } = req.body;
+    const { kode_peserta } = req.dataUser;
 
     try {
       if (!kode_peserta || !nomor_urut) {
