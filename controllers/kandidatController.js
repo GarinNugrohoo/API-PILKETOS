@@ -108,25 +108,29 @@ class KandidatController {
 
   async updateKandidat(req, res) {
     const {
-      id,
-      nomor_urut,
       nama_kandidat,
       password_baru,
       password_lama,
+      nomor_urut,
       visi,
       misi,
     } = req.body;
-    const new_image = req.file ? req.file.filename : null;
+    const { id, role } = req.dataUser;
+
+    const new_image_url = req.file ? req.file.path : null;
+    const new_image_public_id = req.file ? req.file.filename : null;
 
     try {
       if (!id) {
-        if (req.file) fs.unlinkSync(req.file.path);
+        if (new_image_public_id)
+          await cloudinary.uploader.destroy(new_image_public_id);
         return HttpCode.send(res, 400, { message: "Id tidak boleh kosong" });
       }
 
       const kandidat = await Kandidat.findByPk(id);
       if (!kandidat) {
-        if (req.file) fs.unlinkSync(req.file.path);
+        if (new_image_public_id)
+          await cloudinary.uploader.destroy(new_image_public_id);
         return HttpCode.send(res, 404, { message: "Kandidat tidak ditemukan" });
       }
 
@@ -139,27 +143,36 @@ class KandidatController {
           return HttpCode.send(res, 400, { message: "Visi max 5000 karakter" });
         dataUpdate.visi = visi;
       }
+
       if (misi) {
-        if (misi.length > 5000)
-          return HttpCode.send(res, 400, { message: "Misi max 5000 karakter" });
-        dataUpdate.misi = misi;
+        let misiData;
+        if (Array.isArray(misi)) {
+          misiData = JSON.stringify(misi);
+        } else {
+          misiData = JSON.stringify(
+            misi.split("\n").filter((item) => item.trim() !== ""),
+          );
+        }
+        dataUpdate.misi = misiData;
       }
 
-      if (new_image) {
+      if (new_image_url) {
         if (kandidat.image_kandidat) {
-          const oldPath = path.join(
-            __dirname,
-            "../assets/images/",
-            kandidat.image_kandidat,
-          );
-          if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+          const oldPublicId = kandidat.image_kandidat
+            .split("/")
+            .pop()
+            .split(".")[0];
+          await cloudinary.uploader
+            .destroy(oldPublicId)
+            .catch((err) => console.log("Old image delete failed:", err));
         }
-        dataUpdate.image_kandidat = new_image;
+        dataUpdate.image_kandidat = new_image_url;
       }
 
       if (password_baru) {
-        if (!password_lama) {
-          if (req.file) fs.unlinkSync(req.file.path);
+        if (role !== "panitia" && !password_lama) {
+          if (new_image_public_id)
+            await cloudinary.uploader.destroy(new_image_public_id);
           return HttpCode.send(res, 400, {
             message: "Password lama harus diisi",
           });
@@ -167,7 +180,8 @@ class KandidatController {
 
         const isMatch = await bcrypt.compare(password_lama, kandidat.password);
         if (!isMatch) {
-          if (req.file) fs.unlinkSync(req.file.path);
+          if (new_image_public_id)
+            await cloudinary.uploader.destroy(new_image_public_id);
           return HttpCode.send(res, 401, { message: "Password lama salah" });
         }
 
@@ -175,6 +189,8 @@ class KandidatController {
       }
 
       if (Object.keys(dataUpdate).length === 0) {
+        if (new_image_public_id)
+          await cloudinary.uploader.destroy(new_image_public_id);
         return HttpCode.send(res, 400, {
           message: "Tidak ada data yang diubah",
         });
@@ -186,15 +202,10 @@ class KandidatController {
         message: "Berhasil memperbarui data kandidat",
       });
     } catch (err) {
-      if (req.file) {
-        const filePath = path.join(
-          __dirname,
-          "../assets/images/",
-          req.file.filename,
-        );
-        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+      if (new_image_public_id) {
+        await cloudinary.uploader.destroy(new_image_public_id);
       }
-      return HttpCode.send(res, 500, { message: err.message });
+      return HttpCode.send(res, 500, { message: `${err}` });
     }
   }
 
@@ -224,6 +235,8 @@ class KandidatController {
         id: data.id,
         nama_kandidat: data.nama_kandidat,
         password: data.password,
+        visi: data.visi,
+        misi: data.misi,
         role: "kandidat",
       };
       const secretKey = process.env.JWT_SECRET;
