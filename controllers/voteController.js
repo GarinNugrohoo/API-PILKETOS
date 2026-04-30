@@ -92,13 +92,12 @@ class VoteController {
 
       const totalSuaraMasuk = data.reduce((acc, curr) => acc + curr.pemilih, 0);
 
-      const document = new pdf({ margin: 50, size: "A4" });
-      const folderPath = path.join(__dirname, "../assets/pdf");
-      const fileName =
-        Math.floor(Math.random() * 1000000000000000) + "_berita_acara.pdf";
-      const filePath = path.join(folderPath, fileName);
+      const fileName = `Berita_Acara_Pemenang_${tahunLaksana}.pdf`;
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Disposition", `attachment; filename=${fileName}`);
 
-      document.pipe(fs.createWriteStream(filePath));
+      const document = new pdf({ margin: 50, size: "A4" });
+      document.pipe(res);
 
       const dirSekolah = path.join(__dirname, "../assets/images/logo_sekolah/");
       const dirOrganisasi = path.join(
@@ -301,11 +300,6 @@ class VoteController {
       document.text("( __________________________ )", 380, signY + 75);
 
       document.end();
-
-      return HttpCode.send(res, 201, {
-        message: "Berita Acara Pemenang berhasil diterbitkan",
-        data: fileName,
-      });
     } catch (err) {
       return HttpCode.send(res, 500, { message: `${err}` });
     }

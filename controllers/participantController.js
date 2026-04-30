@@ -269,11 +269,6 @@ class ParticipantController {
         });
 
         document.end();
-
-        return HttpCode.send(res, 201, {
-          message: "Kartu seluruh peserta berhasil dibuat",
-          data: fileNameAll,
-        });
       } else if (kelas == "X" || "XI" || "XII") {
         const data = await Participant.findAll({
           where: { kelas: kelas },
@@ -356,11 +351,6 @@ class ParticipantController {
         });
 
         document.end();
-
-        return HttpCode.send(res, 201, {
-          message: `Kartu peserta kelas: ${kelas} berhasil dibuat`,
-          data: fileName,
-        });
       }
     } catch (err) {
       return HttpCode.send(res, 500, {
