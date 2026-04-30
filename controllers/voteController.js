@@ -99,11 +99,8 @@ class VoteController {
       const document = new pdf({ margin: 50, size: "A4" });
       document.pipe(res);
 
-      const dirSekolah = path.join(__dirname, "../assets/images/logo_sekolah/");
-      const dirOrganisasi = path.join(
-        __dirname,
-        "../assets/images/logo_organisasi/",
-      );
+      const dirSekolah = path.join(__dirname, "../assets/logo_sekolah/");
+      const dirOrganisasi = path.join(__dirname, "../assets/logo_organisasi/");
 
       const getFirstFile = (dirPath) => {
         if (fs.existsSync(dirPath)) {
