@@ -44,7 +44,9 @@ class KandidatController {
       });
 
       if (checkDb != null) {
-        if (req.file) fs.unlinkSync(req.file.path);
+        if (req.file && req.file.filename) {
+          await cloudinary.uploader.destroy(req.file.filename);
+        }
         return HttpCode.send(res, 400, {
           message: "Nama atau nomor urut sudah terdaftar",
         });
@@ -66,7 +68,9 @@ class KandidatController {
         data: data,
       });
     } catch (err) {
-      if (req.file) await cloudinary.uploader.destroy(req.file.filename);
+      if (req.file && req.file.filename) {
+        await cloudinary.uploader.destroy(req.file.filename);
+      }
       return HttpCode.send(res, 500, { message: `${err}` });
     }
   }
