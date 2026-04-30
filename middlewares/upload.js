@@ -1,20 +1,18 @@
 const multer = require("multer");
-const path = require("path");
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "assets/images/kandidat/");
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(
-      null,
-      Math.floor(Math.random() * 1000000000000000) +
-        "-" +
-        "kandidat-" +
-        Math.floor(Math.random() * 100000) +
-        ext,
-    );
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "kandidat",
+    allowed_formats: ["jpg", "png", "jpeg", "webp", "gif"],
   },
 });
 
@@ -24,16 +22,10 @@ const upload = multer({
     fileSize: 5 * 1024 * 1024,
   },
   fileFilter: (req, file, cb) => {
-    const filetypes = /jpeg|jpg|png|gif|webp/;
-    const extname = filetypes.test(
-      path.extname(file.originalname).toLowerCase(),
-    );
-    const mimetype = filetypes.test(file.mimetype);
-
-    if (mimetype && extname) {
-      return cb(null, true);
+    if (file.mimetype.startsWith("image/")) {
+      cb(null, true);
     } else {
-      cb(new Error("Hanya file gambar yang diperbolehkan"));
+      cb(new Error("Hanya file gambar yang diperbolehkan"), false);
     }
   },
 });

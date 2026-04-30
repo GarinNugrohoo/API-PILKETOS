@@ -11,7 +11,7 @@ const jwt = require("jsonwebtoken");
 class KandidatController {
   async createKandidat(req, res) {
     const { nomor_urut, nama_kandidat, password, visi, misi } = req.body;
-    const image_kandidat = req.file ? req.file.filename : null;
+    const image_kandidat = req.file ? req.file.path : null;
 
     try {
       if (
@@ -22,23 +22,24 @@ class KandidatController {
         !misi ||
         !image_kandidat
       ) {
+        if (req.file) await cloudinary.uploader.destroy(req.file.filename);
         return HttpCode.send(res, 400, {
           message: "Data kandidat wajib diisi lengkap",
         });
       }
 
-      if (visi.length && misi.length > 5000) {
-        return HttpCode.send(res, 400, {
-          message: "Max 5000 karakter",
-        });
+      let misiData;
+      if (Array.isArray(misi)) {
+        misiData = JSON.stringify(misi);
+      } else {
+        misiData = JSON.stringify(
+          misi.split("\n").filter((item) => item.trim() !== ""),
+        );
       }
 
       const checkDb = await Kandidat.findOne({
         where: {
-          [Op.or]: [
-            { nomor_urut: nomor_urut },
-            { nama_kandidat: nama_kandidat },
-          ],
+          [Op.or]: [{ nomor_urut }, { nama_kandidat }],
         },
       });
 
@@ -47,38 +48,26 @@ class KandidatController {
         return HttpCode.send(res, 400, {
           message: "Nama atau nomor urut sudah terdaftar",
         });
-      } else if (checkDb == null) {
-        const passwordHash = await bcrypt.hash(password, 10);
-
-        const data = await Kandidat.create({
-          nomor_urut: nomor_urut,
-          nama_kandidat: nama_kandidat,
-          password: passwordHash,
-          visi: visi,
-          misi: misi,
-          image_kandidat,
-        });
-
-        return HttpCode.send(res, 201, {
-          message: "Berhasil membuat akun",
-          data: data,
-        });
-      }
-    } catch (err) {
-      if (req.file) {
-        const filePath = path.join(
-          __dirname,
-          "../assets/images/kandidat/",
-          req.file.filename,
-        );
-        fs.unlink(filePath, (err) => {
-          if (err) console.error("Gagal hapus file sampah:", err);
-        });
       }
 
-      return HttpCode.send(res, 500, {
-        message: `${err}`,
+      const passwordHash = await bcrypt.hash(password, 10);
+
+      const data = await Kandidat.create({
+        nomor_urut,
+        nama_kandidat,
+        password: passwordHash,
+        visi,
+        misi: misiData,
+        image_kandidat,
       });
+
+      return HttpCode.send(res, 201, {
+        message: "Berhasil membuat akun",
+        data: data,
+      });
+    } catch (err) {
+      if (req.file) await cloudinary.uploader.destroy(req.file.filename);
+      return HttpCode.send(res, 500, { message: `${err}` });
     }
   }
 
