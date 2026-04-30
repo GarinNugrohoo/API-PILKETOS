@@ -16,6 +16,12 @@ router.get(
   isMaintenance.activeMaintenance,
   kandidatController.getAllKandidat,
 );
+router.get(
+  "/data/id",
+  Auth.roleAccess("kandidat"),
+  isMaintenance.activeMaintenance,
+  kandidatController.getKandidatById,
+);
 
 // POST
 router.post(

@@ -303,6 +303,19 @@
       }
     },
 
+    "/api/kandidat/data/id": {
+      "get": {
+        "tags": ["Kandidat"],
+        "summary": "Get Kandidat By Id",
+        "security": [{ "apiKeyAuth": [], "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Berhasil mengambil data" },
+          "404": { "description": "Data tidak ditemukan" },
+          "500": { "description": "Server Error" }
+        }
+      }
+    },
+
     "/api/kandidat/data": {
       "get": {
         "tags": ["Kandidat"],

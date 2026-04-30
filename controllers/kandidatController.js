@@ -106,6 +106,24 @@ class KandidatController {
     }
   }
 
+  async getKandidatById(req, res) {
+    const { id } = req.dataUser;
+
+    try {
+      const data = await Kandidat.findOne({
+        where: { id: id },
+        attributes: ["nama_kandidat", "image_kandidat", "visi", "misi"],
+      });
+
+      return HttpCode.send(res, 200, {
+        message: "Berhasil mengambil data",
+        data: data,
+      });
+    } catch (err) {
+      return HttpCode.send(res, 500, { message: `${err}` });
+    }
+  }
+
   async updateKandidat(req, res) {
     const {
       nama_kandidat,
