@@ -7,6 +7,7 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const jwt = require("jsonwebtoken");
+const cloudinary = require("cloudinary").v2;
 
 class KandidatController {
   async createKandidat(req, res) {
