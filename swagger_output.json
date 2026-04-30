@@ -94,7 +94,6 @@
             "schema": {
               "type": "object",
               "properties": {
-                "kode_peserta": { "type": "string", "example": "X671257318" },
                 "nomor_urut": { "type": "string", "example": "1" }
               }
             }
