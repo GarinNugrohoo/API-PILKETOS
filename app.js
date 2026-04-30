@@ -14,6 +14,10 @@ app.use(express.json());
 
 app.use(router);
 app.use("/uploads", express.static(path.join(__dirname, "assets/images")));
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "assets/images/kandidat")),
+);
 app.use("/uploads", express.static(path.join(__dirname, "assets/pdf")));
 
 app.get("/", (req, res) => {
