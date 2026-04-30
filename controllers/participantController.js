@@ -197,17 +197,16 @@ class ParticipantController {
             message: "Data tidak ditemukan",
           });
         }
-        const document = new pdf();
 
-        const folderPath = path.join(__dirname, "../assets/pdf");
-        const fileNameAll =
-          Math.floor(Math.random() * 1000000000000000) +
-          "_" +
-          "kartu_peserta_all_" +
-          Math.floor(Math.random() * 10000000) +
-          ".pdf";
-        const filePath = path.join(folderPath, fileNameAll);
-        document.pipe(fs.createWriteStream(filePath));
+        const fileName = `kartu_peserta_ALL_${Date.now()}.pdf`;
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader(
+          "Content-Disposition",
+          `attachment; filename=${fileName}`,
+        );
+
+        const document = new pdf();
+        document.pipe(res);
 
         const margin = 28;
         const cardsPerPage = 40;
@@ -286,17 +285,15 @@ class ParticipantController {
           });
         }
 
-        const document = new pdf();
+        const fileName = `kartu_peserta_${kelas}_${Date.now()}.pdf`;
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader(
+          "Content-Disposition",
+          `attachment; filename=${fileName}`,
+        );
 
-        const folderPath = path.join(__dirname, "../assets/pdf");
-        const fileName =
-          Math.floor(Math.random() * 1000000000000000) +
-          "_" +
-          `kartu_peserta_kelas_${kelas}_` +
-          Math.floor(Math.random() * 1000000) +
-          ".pdf";
-        const filePath = path.join(folderPath, fileName);
-        document.pipe(fs.createWriteStream(filePath));
+        const document = new pdf();
+        document.pipe(res);
 
         const margin = 28;
         const cardsPerPage = 40;
