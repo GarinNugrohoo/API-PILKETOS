@@ -2,75 +2,59 @@ const HttpCode = require("./http-code/httpCode");
 const pdf = require("pdfkit");
 const fs = require("fs");
 const path = require("path");
-const { Kandidat, Participant } = require("../models");
+const { Kandidat, Participant, sequelize } = require("../models");
 
 class VoteController {
   async voting(req, res) {
     const { nomor_urut } = req.body;
     const { kode_peserta } = req.dataUser;
+    const t = await sequelize.transaction();
 
     try {
       if (!kode_peserta || !nomor_urut) {
-        return HttpCode.send(res, 400, {
-          message: "Data voting wajib diisi",
-        });
+        return HttpCode.send(res, 400, { message: "Data voting wajib diisi" });
       }
 
-      const dataKandidat = await Kandidat.findOne({
-        where: {
-          nomor_urut: nomor_urut,
-        },
-      });
-
       const dataPeserta = await Participant.findOne({
-        where: {
-          kode_peserta: kode_peserta,
-        },
+        where: { kode_peserta },
+        transaction: t,
+        lock: t.LOCK.UPDATE,
       });
 
-      if (dataKandidat === null) {
-        return HttpCode.send(res, 400, {
-          message: "Nomor urut tidak terdaftar",
-        });
-      } else if (dataPeserta === null) {
-        return HttpCode.send(res, 400, {
-          message: "Kode peserta tidak valid",
-        });
-      } else if (dataPeserta.memilih === true) {
+      if (!dataPeserta) {
+        await t.rollback();
+        return HttpCode.send(res, 400, { message: "Kode peserta tidak valid" });
+      }
+
+      if (dataPeserta.memilih) {
+        await t.rollback();
         return HttpCode.send(res, 403, {
           message: "Kode sudah digunakan untuk memilih",
         });
       }
 
-      const vote = await Kandidat.increment(
-        {
-          pemilih: 1,
-        },
-        {
-          where: {
-            id: dataKandidat.id,
-          },
-        },
-      );
-
-      const isVote = await Participant.update(
-        {
-          memilih: true,
-        },
-        {
-          where: {
-            id: dataPeserta.id,
-          },
-        },
-      );
-
-      return HttpCode.send(res, 200, {
-        message: "Voting sukses",
+      const dataKandidat = await Kandidat.findOne({
+        where: { nomor_urut },
+        transaction: t,
       });
+
+      if (!dataKandidat) {
+        await t.rollback();
+        return HttpCode.send(res, 400, {
+          message: "Nomor urut tidak terdaftar",
+        });
+      }
+
+      await dataKandidat.increment("pemilih", { by: 1, transaction: t });
+      await dataPeserta.update({ memilih: true }, { transaction: t });
+      await t.commit();
+
+      return HttpCode.send(res, 200, { message: "Voting sukses" });
     } catch (err) {
+      if (t) await t.rollback();
       console.error("LOG DETAIL:", err);
       return HttpCode.send(res, 500, {
-        message: `Terjadi kesalahan pada sistem.`,
+        message: "Terjadi kesalahan pada sistem.",
       });
     }
   }
