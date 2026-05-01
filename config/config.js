@@ -25,7 +25,7 @@ module.exports = {
     pool: {
       max: 1,
       min: 0,
-      acquire: 30000,
+      acquire: 4000,
       idle: 0,
     },
     dialectOptions: {
