@@ -44,6 +44,7 @@ router.patch(
   "/data",
   Auth.roleAccess(["panitia", "kandidat"]),
   isMaintenance.activeMaintenance,
+  upload.single("image_kandidat"),
   kandidatController.updateKandidat,
 );
 
