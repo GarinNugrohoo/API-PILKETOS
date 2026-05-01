@@ -68,8 +68,9 @@ class VoteController {
         message: "Voting sukses",
       });
     } catch (err) {
+      console.error("LOG DETAIL:", err);
       return HttpCode.send(res, 500, {
-        message: `${err}`,
+        message: `Terjadi kesalahan pada sistem.`,
       });
     }
   }
@@ -298,7 +299,10 @@ class VoteController {
 
       document.end();
     } catch (err) {
-      return HttpCode.send(res, 500, { message: `${err}` });
+      console.error("LOG DETAIL:", err);
+      return HttpCode.send(res, 500, {
+        message: `Terjadi kesalahan pada sistem.`,
+      });
     }
   }
 }

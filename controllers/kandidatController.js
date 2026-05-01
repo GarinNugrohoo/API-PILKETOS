@@ -72,7 +72,11 @@ class KandidatController {
       if (req.file && req.file.filename) {
         await cloudinary.uploader.destroy(req.file.filename);
       }
-      return HttpCode.send(res, 500, { message: `${err}` });
+
+      console.error("LOG DETAIL:", err);
+      return HttpCode.send(res, 500, {
+        message: `Terjadi kesalahan pada sistem.`,
+      });
     }
   }
 
@@ -100,8 +104,9 @@ class KandidatController {
         });
       }
     } catch (err) {
+      console.error("LOG DETAIL:", err);
       return HttpCode.send(res, 500, {
-        message: `${err}`,
+        message: `Terjadi kesalahan pada sistem.`,
       });
     }
   }
@@ -120,7 +125,10 @@ class KandidatController {
         data: data,
       });
     } catch (err) {
-      return HttpCode.send(res, 500, { message: `${err}` });
+      console.error("LOG DETAIL:", err);
+      return HttpCode.send(res, 500, {
+        message: `Terjadi kesalahan pada sistem.`,
+      });
     }
   }
 
@@ -223,7 +231,11 @@ class KandidatController {
       if (new_image_public_id) {
         await cloudinary.uploader.destroy(new_image_public_id);
       }
-      return HttpCode.send(res, 500, { message: `${err}` });
+
+      console.error("LOG DETAIL:", err);
+      return HttpCode.send(res, 500, {
+        message: `Terjadi kesalahan pada sistem.`,
+      });
     }
   }
 
@@ -273,8 +285,9 @@ class KandidatController {
         });
       }
     } catch (err) {
+      console.error("LOG DETAIL:", err);
       return HttpCode.send(res, 500, {
-        message: `${err}`,
+        message: `Terjadi kesalahan pada sistem.`,
       });
     }
   }
@@ -311,8 +324,9 @@ class KandidatController {
         });
       }
     } catch (err) {
+      console.error("LOG DETAIL:", err);
       return HttpCode.send(res, 500, {
-        message: `${err}`,
+        message: `Terjadi kesalahan pada sistem.`,
       });
     }
   }

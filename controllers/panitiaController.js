@@ -36,8 +36,9 @@ class PanitiaController {
         message: "Akun panitia berhasil dibuat",
       });
     } catch (err) {
+      console.error("LOG DETAIL:", err);
       return HttpCode.send(res, 500, {
-        message: `${err}`,
+        message: `Terjadi kesalahan pada sistem.`,
       });
     }
   }
@@ -53,8 +54,9 @@ class PanitiaController {
         data: data,
       });
     } catch (err) {
+      console.error("LOG DETAIL:", err);
       return HttpCode.send(res, 500, {
-        message: `${err}`,
+        message: `Terjadi kesalahan pada sistem.`,
       });
     }
   }
@@ -103,8 +105,9 @@ class PanitiaController {
         });
       }
     } catch (err) {
+      console.error("LOG DETAIL:", err);
       return HttpCode.send(res, 500, {
-        message: `${err}`,
+        message: `Terjadi kesalahan pada sistem.`,
       });
     }
   }
@@ -169,8 +172,9 @@ class PanitiaController {
         message: "Akun panitia berhasil diperbarui",
       });
     } catch (err) {
+      console.error("LOG DETAIL:", err);
       return HttpCode.send(res, 500, {
-        message: err.message || "Terjadi kesalahan pada server",
+        message: `Terjadi kesalahan pada sistem.`,
       });
     }
   }
@@ -192,7 +196,10 @@ class PanitiaController {
         return HttpCode.send(res, 200, { message: "Data berhasil dihapus" });
       }
     } catch (err) {
-      HttpCode.send(res, 500, { message: `${err}` });
+      console.error("LOG DETAIL:", err);
+      return HttpCode.send(res, 500, {
+        message: `Terjadi kesalahan pada sistem.`,
+      });
     }
   }
 }

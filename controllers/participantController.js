@@ -89,8 +89,9 @@ class ParticipantController {
         });
       }
     } catch (err) {
+      console.error("LOG DETAIL:", err);
       return HttpCode.send(res, 500, {
-        message: `${err}`,
+        message: `Terjadi kesalahan pada sistem.`,
       });
     }
   }
@@ -112,8 +113,9 @@ class ParticipantController {
         });
       }
     } catch (err) {
+      console.error("LOG DETAIL:", err);
       return HttpCode.send(res, 500, {
-        message: `${err}`,
+        message: `Terjadi kesalahan pada sistem.`,
       });
     }
   }
@@ -129,8 +131,9 @@ class ParticipantController {
         message: "Berhasil menghapus data",
       });
     } catch (err) {
+      console.error("LOG DETAIL:", err);
       return HttpCode.send(res, 500, {
-        message: `${err}`,
+        message: `Terjadi kesalahan pada sistem.`,
       });
     }
   }
@@ -171,7 +174,10 @@ class ParticipantController {
         return HttpCode.send(res, 200, { message: "Data berhasil di reset" });
       }
     } catch (err) {
-      return HttpCode.send(res, 500, { message: `${err}` });
+      console.error("LOG DETAIL:", err);
+      return HttpCode.send(res, 500, {
+        message: `Terjadi kesalahan pada sistem.`,
+      });
     }
   }
 
@@ -353,8 +359,9 @@ class ParticipantController {
         document.end();
       }
     } catch (err) {
+      console.error("LOG DETAIL:", err);
       return HttpCode.send(res, 500, {
-        message: `${err}`,
+        message: `Terjadi kesalahan pada sistem.`,
       });
     }
   }
@@ -410,8 +417,9 @@ class ParticipantController {
         });
       }
     } catch (err) {
+      console.error("LOG DETAIL:", err);
       return HttpCode.send(res, 500, {
-        message: `${err}`,
+        message: `Terjadi kesalahan pada sistem.`,
       });
     }
   }
