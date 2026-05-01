@@ -22,12 +22,12 @@ module.exports = {
     use_env_variable: "DATABASE_URL",
     dialect: "postgres",
     dialectModule: require("pg"),
-    pool: {
-      max: 1,
-      min: 0,
-      acquire: 4000,
-      idle: 0,
-    },
+    // pool: {
+    //   max: 10,
+    //   min: 0,
+    //   acquire: 30000,
+    //   idle: 0,
+    // },
     dialectOptions: {
       ssl: {
         require: true,
