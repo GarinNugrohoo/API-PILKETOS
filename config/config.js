@@ -23,17 +23,17 @@ module.exports = {
     dialect: "postgres",
     dialectModule: require("pg"),
     pool: {
-      max: 10,
+      max: 1,
       min: 0,
-      acquire: 60000,
-      idle: 10000,
+      acquire: 30000,
+      idle: 0,
     },
     dialectOptions: {
       ssl: {
         require: true,
         rejectUnauthorized: false,
       },
-      keepAlive: true,
+      keepAlive: false,
     },
   },
 };
