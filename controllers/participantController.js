@@ -98,14 +98,31 @@ class ParticipantController {
 
   async getAllPeserta(req, res) {
     try {
-      const data = await Participant.findAll({
+      const page = parseInt(req.query.page) || 1;
+      const limit = 50; // Per halaman 50 data
+      const offset = (page - 1) * limit;
+      const { count, rows } = await Participant.findAndCountAll({
         attributes: ["id", "kode_peserta", "kelas", "memilih", "createdAt"],
+        limit: limit,
+        offset: offset,
+        order: [
+          ["memilih", "DESC"],
+          ["createdAt", "DESC"],
+        ],
       });
 
-      if (data.length != 0) {
+      if (rows.length > 0) {
+        const totalPages = Math.ceil(count / limit);
+
         return HttpCode.send(res, 200, {
           message: "Berhasil mengambil data",
-          data: data,
+          data: rows,
+          pagination: {
+            totalData: count,
+            totalPages: totalPages,
+            currentPage: page,
+            perPage: limit,
+          },
         });
       } else {
         return HttpCode.send(res, 404, {
