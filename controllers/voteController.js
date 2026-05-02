@@ -41,7 +41,7 @@ class VoteController {
       if (!dataKandidat) {
         await t.rollback();
         return HttpCode.send(res, 400, {
-          message: "Nomor urut tidak terdaftar",
+          message: "Kandidat tidak terdaftar",
         });
       }
 

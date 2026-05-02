@@ -99,7 +99,7 @@ class ParticipantController {
   async getAllPeserta(req, res) {
     try {
       const data = await Participant.findAll({
-        attributes: ["id", "kode_peserta", "kelas", "memilih"],
+        attributes: ["id", "kode_peserta", "kelas", "memilih", "createdAt"],
       });
 
       if (data.length != 0) {
@@ -139,11 +139,11 @@ class ParticipantController {
   }
 
   async resetPesertaStatus(req, res) {
-    const { status, kode_peserta, kode_reset } = req.body;
+    const { kode_peserta, kode_reset } = req.body;
     const t = await sequelize.transaction();
 
     try {
-      if (status === undefined || !kode_peserta || !kode_reset) {
+      if (!kode_peserta || !kode_reset) {
         await t.rollback();
         return HttpCode.send(res, 400, { message: "Data tidak lengkap" });
       }
