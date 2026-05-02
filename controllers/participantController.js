@@ -406,6 +406,7 @@ class ParticipantController {
         const payload = {
           id: data.id,
           kode_peserta: data.kode_peserta,
+          memilih: data.memilih,
           role: "peserta",
         };
         const secretKey = process.env.JWT_SECRET;
