@@ -11,11 +11,13 @@ const cloudinary = require("cloudinary").v2;
 
 class KandidatController {
   async createKandidat(req, res) {
-    const { nomor_urut, nama_kandidat, password, visi, misi } = req.body;
+    const { username, nomor_urut, nama_kandidat, password, visi, misi } =
+      req.body;
     const image_kandidat = req.file ? req.file.path : null;
 
     try {
       if (
+        !username ||
         !nomor_urut ||
         !nama_kandidat ||
         !password ||
@@ -58,6 +60,7 @@ class KandidatController {
       const data = await Kandidat.create({
         nomor_urut,
         nama_kandidat,
+        username,
         password: passwordHash,
         visi,
         misi: misiData,
@@ -240,30 +243,30 @@ class KandidatController {
   }
 
   async loginKandidat(req, res) {
-    const { nama_kandidat, password } = req.body;
+    const { username, password } = req.body;
 
     try {
-      if (!nama_kandidat || !password) {
+      if (!username || !password) {
         return HttpCode.send(res, 400, {
-          message: "Nama atau password wajib diisi",
+          message: "Username atau password wajib diisi",
         });
       }
 
       const data = await Kandidat.findOne({
         where: {
-          nama_kandidat: nama_kandidat,
+          username: username,
         },
       });
 
       if (data === null) {
         return HttpCode.send(res, 400, {
-          message: "Nama atau Password salah",
+          message: "Username atau Password salah",
         });
       }
 
       const payload = {
         id: data.id,
-        nama_kandidat: data.nama_kandidat,
+        username: data.username,
         password: data.password,
         visi: data.visi,
         misi: data.misi,
@@ -281,7 +284,7 @@ class KandidatController {
         });
       } else {
         return HttpCode.send(res, 400, {
-          message: "Nama atau Password salah",
+          message: "Username atau Password salah",
         });
       }
     } catch (err) {

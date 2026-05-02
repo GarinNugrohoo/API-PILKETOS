@@ -214,11 +214,17 @@
           {
             "name": "nomor_urut",
             "in": "formData",
-            "type": "string",
+            "type": "integer",
             "required": true
           },
           {
             "name": "nama_kandidat",
+            "in": "formData",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "username",
             "in": "formData",
             "type": "string",
             "required": true
