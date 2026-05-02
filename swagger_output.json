@@ -276,7 +276,7 @@
             "schema": {
               "type": "object",
               "properties": {
-                "nama_kandidat": { "example": "kandidat" },
+                "username": { "example": "kandidat" },
                 "password": { "example": "kandidat" }
               }
             }
