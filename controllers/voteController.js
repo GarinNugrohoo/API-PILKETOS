@@ -2,12 +2,12 @@ const HttpCode = require("./http-code/httpCode");
 const pdf = require("pdfkit");
 const fs = require("fs");
 const path = require("path");
-const { Kandidat, Participant, sequelize } = require("../models");
+const { Kandidat, Participant, LogVote, sequelize } = require("../models");
 
 class VoteController {
   async voting(req, res) {
     const { nomor_urut } = req.body;
-    const { kode_peserta } = req.dataUser;
+    const { kode_peserta, id } = req.dataUser;
     const t = await sequelize.transaction();
 
     try {
@@ -45,6 +45,14 @@ class VoteController {
         });
       }
 
+      await LogVote.create(
+        {
+          id_Participants: id,
+          id_Kandidats: dataKandidat.id,
+        },
+        { transaction: t },
+      );
+
       await dataKandidat.increment("pemilih", { by: 1, transaction: t });
       await dataPeserta.update({ memilih: true }, { transaction: t });
       await t.commit();
@@ -53,6 +61,11 @@ class VoteController {
     } catch (err) {
       if (t) await t.rollback();
       console.error("LOG DETAIL:", err);
+      if (err.name === "SequelizeUniqueConstraintError") {
+        return HttpCode.send(res, 403, {
+          message: "Anda sudah tercatat melakukan voting.",
+        });
+      }
       return HttpCode.send(res, 500, {
         message: "Terjadi kesalahan pada sistem.",
       });
