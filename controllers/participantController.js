@@ -99,15 +99,15 @@ class ParticipantController {
   async getAllPeserta(req, res) {
     try {
       const page = parseInt(req.query.page) || 1;
-      const limit = 50; // Per halaman 50 data
+      const limit = 50;
       const offset = (page - 1) * limit;
       const { count, rows } = await Participant.findAndCountAll({
         attributes: ["id", "kode_peserta", "kelas", "memilih", "createdAt"],
         limit: limit,
         offset: offset,
         order: [
-          ["memilih", "DESC"],
           ["createdAt", "DESC"],
+          ["id", "DESC"],
         ],
       });
 
