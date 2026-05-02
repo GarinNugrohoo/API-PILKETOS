@@ -19,7 +19,6 @@ module.exports = {
       },
       id_Kandidats: {
         type: Sequelize.INTEGER,
-        unique: true,
         references: {
           model: "Kandidats",
           key: "id",
