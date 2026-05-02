@@ -284,7 +284,7 @@
         ],
         "responses": {
           "200": { "description": "Login berhasil" },
-          "400": { "description": "Nama atau Password salah" },
+          "400": { "description": "Username atau Password salah" },
           "500": { "description": "Server Error" }
         }
       }
