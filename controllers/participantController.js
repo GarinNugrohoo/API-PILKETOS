@@ -260,7 +260,7 @@ class ParticipantController {
           document
             .fontSize(8)
             .font("Helvetica")
-            .text(`KELAS: ${p.kelas || "-"}`, x, y + 43, {
+            .text(`KATEGORI: ${p.kelas || "-"}`, x, y + 43, {
               width: cardWidth,
               align: "center",
             });
@@ -342,7 +342,7 @@ class ParticipantController {
           document
             .fontSize(8)
             .font("Helvetica")
-            .text(`KELAS: ${p.kelas || "-"}`, x, y + 43, {
+            .text(`KATEGORI: ${p.kelas || "-"}`, x, y + 43, {
               width: cardWidth,
               align: "center",
             });
