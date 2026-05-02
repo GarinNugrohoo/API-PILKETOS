@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const HttpCode = require("./http-code/httpCode");
 const jwt = require("jsonwebtoken");
-const { Participant } = require("../models");
+const { Participant, sequelize } = require("../models");
 const { Sequelize } = require("sequelize");
 const kandidatController = require("./kandidatController");
 
@@ -140,43 +140,64 @@ class ParticipantController {
 
   async resetPesertaStatus(req, res) {
     const { status, kode_peserta, kode_reset } = req.body;
+    const t = await sequelize.transaction();
 
     try {
-      if (!status || !kode_peserta || !kode_reset) {
-        return HttpCode.send(res, 400, {
-          message: "Status, kode reset, atau kode peserta tidak valid",
-        });
+      if (status === undefined || !kode_peserta || !kode_reset) {
+        await t.rollback();
+        return HttpCode.send(res, 400, { message: "Data tidak lengkap" });
       }
 
       if (kode_reset !== process.env.KODE_RESET) {
-        return HttpCode.send(res, 400, {
-          message: "Status, kode reset, atau kode peserta tidak valid",
+        await t.rollback();
+        return HttpCode.send(res, 400, { message: "Kode reset tidak valid" });
+      }
+
+      const dataPeserta = await Participant.findOne({
+        where: { kode_peserta },
+        transaction: t,
+        lock: t.LOCK.UPDATE,
+      });
+
+      if (!dataPeserta) {
+        await t.rollback();
+        return HttpCode.send(res, 404, {
+          message: "Data peserta tidak ditemukan",
         });
       }
 
-      if (status === false) {
-        return HttpCode.send(res, 400, { message: "Invalid status" });
+      if (dataPeserta.memilih === false) {
+        await t.rollback();
+        return HttpCode.send(res, 400, {
+          message: "Status peserta belum memilih",
+        });
       }
 
-      const data = await Participant.findOne({
-        where: { kode_peserta: kode_peserta },
+      const userLog = await LogVote.findOne({
+        where: { id_Participants: dataPeserta.id },
+        transaction: t,
       });
 
-      if (data === null) {
-        return HttpCode.send(res, 404, { message: "Data tidak ditemukan" });
-      } else if (data.memilih === false) {
-        return HttpCode.send(res, 400, { message: "Invalid status" });
-      } else if (data.memilih === true) {
-        const updateData = await Participant.update(
-          { memilih: false },
-          { where: { kode_peserta: kode_peserta } },
-        );
-        return HttpCode.send(res, 200, { message: "Data berhasil di reset" });
+      if (userLog) {
+        await Kandidat.decrement("pemilih", {
+          by: 1,
+          where: { id: userLog.id_Kandidats },
+          transaction: t,
+        });
+
+        await userLog.destroy({ transaction: t });
       }
+
+      await dataPeserta.update({ memilih: false }, { transaction: t });
+      await t.commit();
+      return HttpCode.send(res, 200, {
+        message: "Data berhasil direset dan suara kandidat telah dikurangi",
+      });
     } catch (err) {
+      if (t) await t.rollback();
       console.error("LOG DETAIL:", err);
       return HttpCode.send(res, 500, {
-        message: `Terjadi kesalahan pada sistem.`,
+        message: "Terjadi kesalahan pada sistem.",
       });
     }
   }
