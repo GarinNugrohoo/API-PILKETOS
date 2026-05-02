@@ -139,10 +139,49 @@
     "/api/peserta/data": {
       "get": {
         "tags": ["Peserta"],
-        "summary": "Ambil Semua Data Peserta",
+        "summary": "Ambil Data Peserta dengan Pagination",
+        "description": "Mengambil data peserta secara bertahap (50 data per halaman). True (sudah memilih) akan didahulukan.",
         "security": [{ "apiKeyAuth": [], "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Nomor halaman yang ingin diambil",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          }
+        ],
         "responses": {
-          "200": { "description": "Berhasil mengambil data" },
+          "200": {
+            "description": "Berhasil mengambil data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Participant" }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "totalData": { "type": "integer" },
+                        "totalPages": { "type": "integer" },
+                        "currentPage": { "type": "integer" },
+                        "perPage": { "type": "integer" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": { "description": "Data tidak ditemukan" },
           "401": { "description": "Unauthorized" },
           "500": { "description": "Server Error" }
