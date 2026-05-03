@@ -141,7 +141,7 @@ class ParticipantController {
     try {
       const data = await Participant.destroy({
         truncate: true,
-        cascade: false,
+        cascade: true,
       });
 
       return HttpCode.send(res, 200, {
