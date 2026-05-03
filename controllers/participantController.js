@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const HttpCode = require("./http-code/httpCode");
 const jwt = require("jsonwebtoken");
-const { Participant, sequelize } = require("../models");
+const { Participant, LogVote, sequelize } = require("../models");
 const { Sequelize } = require("sequelize");
 const kandidatController = require("./kandidatController");
 
