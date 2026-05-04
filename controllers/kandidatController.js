@@ -31,13 +31,32 @@ class KandidatController {
         });
       }
 
-      let misiData;
-      if (Array.isArray(misi)) {
-        misiData = JSON.stringify(misi);
-      } else {
-        misiData = JSON.stringify(
-          misi.split("\n").filter((item) => item.trim() !== ""),
-        );
+      if (misi) {
+        let misiArray = [];
+
+        if (Array.isArray(misi)) {
+          misiArray = misi.map((m) => m.trim()).filter(Boolean);
+        } else if (typeof misi === "string") {
+          if (misi.includes("||")) {
+            misiArray = misi
+              .split("||")
+              .map((m) => m.trim())
+              .filter(Boolean);
+          } else if (misi.includes("---")) {
+            misiArray = misi
+              .split("---")
+              .map((m) => m.trim())
+              .filter(Boolean);
+          } else if (misi.includes("\n")) {
+            misiArray = misi
+              .split("\n")
+              .map((m) => m.trim())
+              .filter(Boolean);
+          } else if (misi.trim()) {
+            misiArray = [misi.trim()];
+          }
+        }
+        dataUpdate.misi = misiArray.join(" || ");
       }
 
       const checkDb = await Kandidat.findOne({
@@ -90,6 +109,7 @@ class KandidatController {
           "id",
           "nomor_urut",
           "nama_kandidat",
+          "username",
           "visi",
           "misi",
           "image_kandidat",
@@ -137,6 +157,7 @@ class KandidatController {
 
   async updateKandidat(req, res) {
     const {
+      username,
       nama_kandidat,
       password_baru,
       password_lama,
@@ -174,15 +195,31 @@ class KandidatController {
       }
 
       if (misi) {
-        let misiData;
+        let misiArray = [];
+
         if (Array.isArray(misi)) {
-          misiData = JSON.stringify(misi);
-        } else {
-          misiData = JSON.stringify(
-            misi.split("\n").filter((item) => item.trim() !== ""),
-          );
+          misiArray = misi.map((m) => m.trim()).filter(Boolean);
+        } else if (typeof misi === "string") {
+          if (misi.includes("||")) {
+            misiArray = misi
+              .split("||")
+              .map((m) => m.trim())
+              .filter(Boolean);
+          } else if (misi.includes("---")) {
+            misiArray = misi
+              .split("---")
+              .map((m) => m.trim())
+              .filter(Boolean);
+          } else if (misi.includes("\n")) {
+            misiArray = misi
+              .split("\n")
+              .map((m) => m.trim())
+              .filter(Boolean);
+          } else if (misi.trim()) {
+            misiArray = [misi.trim()];
+          }
         }
-        dataUpdate.misi = misiData;
+        dataUpdate.misi = misiArray.join(" || ");
       }
 
       if (new_image_url) {
@@ -198,7 +235,14 @@ class KandidatController {
         dataUpdate.image_kandidat = new_image_url;
       }
 
+      if (username) {
+        dataUpdate.username = username;
+      }
+
       if (password_baru) {
+        if (role === "panitia") {
+          dataUpdate.password = await bcrypt.hash(password_baru, 10);
+        }
         if (role !== "panitia" && !password_lama) {
           if (new_image_public_id)
             await cloudinary.uploader.destroy(new_image_public_id);
@@ -207,14 +251,19 @@ class KandidatController {
           });
         }
 
-        const isMatch = await bcrypt.compare(password_lama, kandidat.password);
-        if (!isMatch) {
-          if (new_image_public_id)
-            await cloudinary.uploader.destroy(new_image_public_id);
-          return HttpCode.send(res, 401, { message: "Password lama salah" });
-        }
+        if (role !== "panitia") {
+          const isMatch = await bcrypt.compare(
+            password_lama,
+            kandidat.password,
+          );
+          if (!isMatch) {
+            if (new_image_public_id)
+              await cloudinary.uploader.destroy(new_image_public_id);
+            return HttpCode.send(res, 401, { message: "Password lama salah" });
+          }
 
-        dataUpdate.password = await bcrypt.hash(password_baru, 10);
+          dataUpdate.password = await bcrypt.hash(password_baru, 10);
+        }
       }
 
       if (Object.keys(dataUpdate).length === 0) {
