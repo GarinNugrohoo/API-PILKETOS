@@ -1,5 +1,5 @@
 const bcrypt = require("bcrypt");
-const { Kandidat } = require("../models");
+const { Kandidat, LogVote, sequelize } = require("../models");
 const { image } = require("pdfkit");
 const { where, Op } = require("sequelize");
 const HttpCode = require("./http-code/httpCode");
@@ -31,37 +31,29 @@ class KandidatController {
         });
       }
 
+      let misiData = "";
       if (misi) {
-        let misiArray = [];
-
         if (Array.isArray(misi)) {
-          misiArray = misi.map((m) => m.trim()).filter(Boolean);
-        } else if (typeof misi === "string") {
-          if (misi.includes("||")) {
-            misiArray = misi
-              .split("||")
-              .map((m) => m.trim())
-              .filter(Boolean);
-          } else if (misi.includes("---")) {
-            misiArray = misi
-              .split("---")
-              .map((m) => m.trim())
-              .filter(Boolean);
-          } else if (misi.includes("\n")) {
-            misiArray = misi
-              .split("\n")
-              .map((m) => m.trim())
-              .filter(Boolean);
-          } else if (misi.trim()) {
-            misiArray = [misi.trim()];
-          }
+          misiData = JSON.stringify(misi);
+        } else if (typeof misi === "string" && misi.includes(" || ")) {
+          const misiArray = misi
+            .split(" || ")
+            .filter((item) => item.trim() !== "");
+          misiData = JSON.stringify(misiArray);
+        } else if (typeof misi === "string" && misi.includes("\n")) {
+          misiData = JSON.stringify(
+            misi.split("\n").filter((item) => item.trim() !== ""),
+          );
+        } else {
+          misiData = JSON.stringify([misi]);
         }
-        dataUpdate.misi = misiArray.join(" || ");
+      } else {
+        misiData = JSON.stringify([]);
       }
 
       const checkDb = await Kandidat.findOne({
         where: {
-          [Op.or]: [{ nomor_urut }, { nama_kandidat }],
+          [Op.or]: [{ nomor_urut }, { nama_kandidat }, { username }],
         },
       });
 
@@ -346,9 +338,11 @@ class KandidatController {
 
   async deleteKandidatById(req, res) {
     const { id } = req.params;
+    const transaction = await sequelize.transaction();
 
     try {
       if (isNaN(id)) {
+        await transaction.rollback();
         return HttpCode.send(res, 400, {
           message: "Id tidak valid",
         });
@@ -358,27 +352,60 @@ class KandidatController {
         where: {
           id: id,
         },
+        transaction,
       });
 
       if (idCheck == null) {
-        return HttpCode.send(res, 400, {
-          message: "id tidak ditemukan",
-        });
-      } else if (idCheck != null) {
-        await Kandidat.destroy({
-          where: {
-            id: idCheck.id,
-          },
-        });
-
-        return HttpCode.send(res, 200, {
-          message: "Berhasil menghapus data",
+        await transaction.rollback();
+        return HttpCode.send(res, 404, {
+          message: "Kandidat tidak ditemukan",
         });
       }
+
+      const deletedVotes = await LogVote.destroy({
+        where: {
+          id_Kandidats: id,
+        },
+        transaction,
+      });
+
+      await Kandidat.destroy({
+        where: {
+          id: id,
+        },
+        transaction,
+      });
+
+      await transaction.commit();
+
+      return HttpCode.send(res, 200, {
+        message: `Berhasil menghapus data kandidat ${idCheck.nama_kandidat}`,
+        data: {
+          id: idCheck.id,
+          nama_kandidat: idCheck.nama_kandidat,
+          deletedVotes: deletedVotes,
+        },
+      });
     } catch (err) {
+      await transaction.rollback();
       console.error("LOG DETAIL:", err);
+
+      if (
+        err.name === "SequelizeForeignKeyConstraintError" ||
+        err.parent?.code === "23503"
+      ) {
+        return HttpCode.send(res, 409, {
+          message:
+            "Kandidat tidak dapat dihapus karena masih memiliki data terkait.",
+          code: "FOREIGN_KEY_CONSTRAINT",
+          detail:
+            err.parent?.detail ||
+            "Kandidat ini masih terhubung dengan data lain",
+        });
+      }
+
       return HttpCode.send(res, 500, {
-        message: `Terjadi kesalahan pada sistem.`,
+        message: "Terjadi kesalahan pada sistem. Silakan coba lagi nanti.",
       });
     }
   }
