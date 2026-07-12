@@ -31,25 +31,29 @@ class KandidatController {
         });
       }
 
-      let misiData = "";
+      let misiString = "";
+
       if (typeof misi === "string") {
         if (misi.includes("||")) {
           const misiArray = misi
             .split("||")
             .map((m) => m.trim())
             .filter(Boolean);
-          misiData = JSON.stringify(misiArray);
+          misiString = misiArray.join(" || ");
         } else if (misi.includes("\n")) {
           const misiArray = misi
             .split("\n")
             .map((m) => m.trim())
             .filter(Boolean);
-          misiData = JSON.stringify(misiArray);
+          misiString = misiArray.join(" || ");
         } else if (misi.trim()) {
-          misiData = JSON.stringify([misi.trim()]);
+          misiString = misi.trim();
         }
       } else if (Array.isArray(misi)) {
-        misiData = JSON.stringify(misi);
+        misiString = misi
+          .map((m) => m.trim())
+          .filter(Boolean)
+          .join(" || ");
       }
 
       const checkDb = await Kandidat.findOne({
