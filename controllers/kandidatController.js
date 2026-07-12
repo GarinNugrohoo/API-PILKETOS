@@ -32,23 +32,24 @@ class KandidatController {
       }
 
       let misiData = "";
-      if (misi) {
-        if (Array.isArray(misi)) {
-          misiData = JSON.stringify(misi);
-        } else if (typeof misi === "string" && misi.includes(" || ")) {
+      if (typeof misi === "string") {
+        if (misi.includes("||")) {
           const misiArray = misi
-            .split(" || ")
-            .filter((item) => item.trim() !== "");
+            .split("||")
+            .map((m) => m.trim())
+            .filter(Boolean);
           misiData = JSON.stringify(misiArray);
-        } else if (typeof misi === "string" && misi.includes("\n")) {
-          misiData = JSON.stringify(
-            misi.split("\n").filter((item) => item.trim() !== ""),
-          );
-        } else {
-          misiData = JSON.stringify([misi]);
+        } else if (misi.includes("\n")) {
+          const misiArray = misi
+            .split("\n")
+            .map((m) => m.trim())
+            .filter(Boolean);
+          misiData = JSON.stringify(misiArray);
+        } else if (misi.trim()) {
+          misiData = JSON.stringify([misi.trim()]);
         }
-      } else {
-        misiData = JSON.stringify([]);
+      } else if (Array.isArray(misi)) {
+        misiData = JSON.stringify(misi);
       }
 
       const checkDb = await Kandidat.findOne({
@@ -148,16 +149,9 @@ class KandidatController {
   }
 
   async updateKandidat(req, res) {
-    const {
-      username,
-      nama_kandidat,
-      password_baru,
-      password_lama,
-      nomor_urut,
-      visi,
-      misi,
-    } = req.body;
-    const { id, role } = req.dataUser;
+    const { username, nama_kandidat, password_baru, nomor_urut, visi, misi } =
+      req.body;
+    const { id } = req.dataUser;
 
     const new_image_url = req.file ? req.file.path : null;
     const new_image_public_id = req.file ? req.file.filename : null;
@@ -177,21 +171,39 @@ class KandidatController {
       }
 
       let dataUpdate = {};
-      if (nomor_urut) dataUpdate.nomor_urut = nomor_urut;
+
+      if (nomor_urut !== undefined && nomor_urut !== null) {
+        const existingNomorUrut = await Kandidat.findOne({
+          where: {
+            nomor_urut: nomor_urut,
+            id: { [Op.ne]: id },
+          },
+        });
+        if (existingNomorUrut) {
+          if (new_image_public_id)
+            await cloudinary.uploader.destroy(new_image_public_id);
+          return HttpCode.send(res, 400, {
+            message: `Nomor urut ${nomor_urut} sudah digunakan oleh kandidat lain`,
+          });
+        }
+        dataUpdate.nomor_urut = nomor_urut;
+      }
+
       if (nama_kandidat) dataUpdate.nama_kandidat = nama_kandidat;
 
-      if (visi) {
-        if (visi.length > 5000)
+      if (visi !== undefined) {
+        if (visi.length > 5000) {
+          if (new_image_public_id)
+            await cloudinary.uploader.destroy(new_image_public_id);
           return HttpCode.send(res, 400, { message: "Visi max 5000 karakter" });
+        }
         dataUpdate.visi = visi;
       }
 
-      if (misi) {
+      if (misi !== undefined) {
         let misiArray = [];
 
-        if (Array.isArray(misi)) {
-          misiArray = misi.map((m) => m.trim()).filter(Boolean);
-        } else if (typeof misi === "string") {
+        if (typeof misi === "string") {
           if (misi.includes("||")) {
             misiArray = misi
               .split("||")
@@ -210,8 +222,11 @@ class KandidatController {
           } else if (misi.trim()) {
             misiArray = [misi.trim()];
           }
+        } else if (Array.isArray(misi)) {
+          misiArray = misi.map((m) => m.trim()).filter(Boolean);
         }
-        dataUpdate.misi = misiArray.join(" || ");
+
+        dataUpdate.misi = JSON.stringify(misiArray);
       }
 
       if (new_image_url) {
@@ -227,35 +242,25 @@ class KandidatController {
         dataUpdate.image_kandidat = new_image_url;
       }
 
-      if (username) {
+      if (username !== undefined) {
+        const existingUsername = await Kandidat.findOne({
+          where: {
+            username: username,
+            id: { [Op.ne]: id },
+          },
+        });
+        if (existingUsername) {
+          if (new_image_public_id)
+            await cloudinary.uploader.destroy(new_image_public_id);
+          return HttpCode.send(res, 400, {
+            message: `Username ${username} sudah digunakan`,
+          });
+        }
         dataUpdate.username = username;
       }
 
       if (password_baru) {
-        if (role === "panitia") {
-          dataUpdate.password = await bcrypt.hash(password_baru, 10);
-        }
-        if (role !== "panitia" && !password_lama) {
-          if (new_image_public_id)
-            await cloudinary.uploader.destroy(new_image_public_id);
-          return HttpCode.send(res, 400, {
-            message: "Password lama harus diisi",
-          });
-        }
-
-        if (role !== "panitia") {
-          const isMatch = await bcrypt.compare(
-            password_lama,
-            kandidat.password,
-          );
-          if (!isMatch) {
-            if (new_image_public_id)
-              await cloudinary.uploader.destroy(new_image_public_id);
-            return HttpCode.send(res, 401, { message: "Password lama salah" });
-          }
-
-          dataUpdate.password = await bcrypt.hash(password_baru, 10);
-        }
+        dataUpdate.password = await bcrypt.hash(password_baru, 10);
       }
 
       if (Object.keys(dataUpdate).length === 0) {
@@ -270,12 +275,15 @@ class KandidatController {
 
       return HttpCode.send(res, 200, {
         message: "Berhasil memperbarui data kandidat",
+        data: {
+          id: id,
+          updatedFields: Object.keys(dataUpdate),
+        },
       });
     } catch (err) {
       if (new_image_public_id) {
         await cloudinary.uploader.destroy(new_image_public_id);
       }
-
       console.error("LOG DETAIL:", err);
       return HttpCode.send(res, 500, {
         message: `Terjadi kesalahan pada sistem.`,
