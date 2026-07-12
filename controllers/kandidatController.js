@@ -72,14 +72,13 @@ class KandidatController {
       }
 
       const passwordHash = await bcrypt.hash(password, 10);
-
       const data = await Kandidat.create({
         nomor_urut,
         nama_kandidat,
         username,
         password: passwordHash,
         visi,
-        misi: misiData,
+        misi: misiString,
         image_kandidat,
       });
 
