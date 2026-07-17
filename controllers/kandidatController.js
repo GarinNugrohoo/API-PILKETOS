@@ -152,15 +152,12 @@ class KandidatController {
   }
 
   async updateKandidat(req, res) {
-    const {
-      id,
-      username,
-      nama_kandidat,
-      password_baru,
-      nomor_urut,
-      visi,
-      misi,
-    } = req.body;
+    const bodyId = req.body.id;
+    const tokenId = req.dataUser?.id;
+    const id = bodyId || tokenId;
+
+    const { username, nama_kandidat, password_baru, nomor_urut, visi, misi } =
+      req.body;
 
     const new_image_url = req.file ? req.file.path : null;
     const new_image_public_id = req.file ? req.file.filename : null;
@@ -169,19 +166,43 @@ class KandidatController {
       if (!id) {
         if (new_image_public_id)
           await cloudinary.uploader.destroy(new_image_public_id);
-        return HttpCode.send(res, 400, { message: "Id tidak boleh kosong" });
+        return HttpCode.send(res, 400, {
+          message:
+            "Id kandidat tidak ditemukan. Kirim id di body atau login terlebih dahulu.",
+        });
       }
 
       const kandidat = await Kandidat.findByPk(id);
       if (!kandidat) {
         if (new_image_public_id)
           await cloudinary.uploader.destroy(new_image_public_id);
-        return HttpCode.send(res, 404, { message: "Kandidat tidak ditemukan" });
+        return HttpCode.send(res, 404, {
+          message: `Kandidat dengan id ${id} tidak ditemukan`,
+        });
+      }
+
+      const userRole = req.dataUser?.role; // Ambil role dari token
+      const userId = req.dataUser?.id; // Ambil id user dari token
+
+      if (userRole === "kandidat" && userId !== id) {
+        if (new_image_public_id)
+          await cloudinary.uploader.destroy(new_image_public_id);
+        return HttpCode.send(res, 403, {
+          message: "Anda tidak memiliki akses untuk mengedit kandidat lain.",
+        });
       }
 
       let dataUpdate = {};
 
       if (nomor_urut !== undefined && nomor_urut !== null) {
+        if (userRole === "kandidat") {
+          if (new_image_public_id)
+            await cloudinary.uploader.destroy(new_image_public_id);
+          return HttpCode.send(res, 403, {
+            message: "Kandidat tidak diizinkan mengubah nomor urut.",
+          });
+        }
+
         const existingNomorUrut = await Kandidat.findOne({
           where: {
             nomor_urut: nomor_urut,
@@ -252,6 +273,14 @@ class KandidatController {
       }
 
       if (username !== undefined) {
+        if (userRole === "kandidat") {
+          if (new_image_public_id)
+            await cloudinary.uploader.destroy(new_image_public_id);
+          return HttpCode.send(res, 403, {
+            message: "Kandidat tidak diizinkan mengubah username.",
+          });
+        }
+
         const existingUsername = await Kandidat.findOne({
           where: {
             username: username,
@@ -287,6 +316,7 @@ class KandidatController {
         data: {
           id: id,
           updatedFields: Object.keys(dataUpdate),
+          role: userRole,
         },
       });
     } catch (err) {
