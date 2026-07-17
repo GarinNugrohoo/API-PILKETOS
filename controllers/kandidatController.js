@@ -152,9 +152,15 @@ class KandidatController {
   }
 
   async updateKandidat(req, res) {
-    const { username, nama_kandidat, password_baru, nomor_urut, visi, misi } =
-      req.body;
-    const { id } = req.dataUser;
+    const {
+      id,
+      username,
+      nama_kandidat,
+      password_baru,
+      nomor_urut,
+      visi,
+      misi,
+    } = req.body;
 
     const new_image_url = req.file ? req.file.path : null;
     const new_image_public_id = req.file ? req.file.filename : null;
