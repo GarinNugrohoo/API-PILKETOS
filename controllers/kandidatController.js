@@ -210,32 +210,32 @@ class KandidatController {
       }
 
       if (misi !== undefined) {
-        let misiArray = [];
+        let misiString = "";
 
         if (typeof misi === "string") {
           if (misi.includes("||")) {
-            misiArray = misi
+            const misiArray = misi
               .split("||")
               .map((m) => m.trim())
               .filter(Boolean);
-          } else if (misi.includes("---")) {
-            misiArray = misi
-              .split("---")
-              .map((m) => m.trim())
-              .filter(Boolean);
+            misiString = misiArray.join(" || ");
           } else if (misi.includes("\n")) {
-            misiArray = misi
+            const misiArray = misi
               .split("\n")
               .map((m) => m.trim())
               .filter(Boolean);
+            misiString = misiArray.join(" || ");
           } else if (misi.trim()) {
-            misiArray = [misi.trim()];
+            misiString = misi.trim();
           }
         } else if (Array.isArray(misi)) {
-          misiArray = misi.map((m) => m.trim()).filter(Boolean);
+          misiString = misi
+            .map((m) => m.trim())
+            .filter(Boolean)
+            .join(" || ");
         }
 
-        dataUpdate.misi = JSON.stringify(misiArray);
+        dataUpdate.misi = misiString;
       }
 
       if (new_image_url) {
