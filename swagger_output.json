@@ -5,9 +5,9 @@
     "description": "Dokumentasi Endpoint API PILKETOS-WEB",
     "version": "1.0.0"
   },
-  "host": "api-pilketos.vercel.app",
+  "host": "localhost:3000",
   "basePath": "/",
-  "schemes": ["https"],
+  "schemes": ["http"],
   "securityDefinitions": {
     "bearerAuth": {
       "type": "apiKey",
